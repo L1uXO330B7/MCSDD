@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>musicPlayer</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.css'
+        integrity='sha512-1hsteeq9xTM5CX6NsXiJu3Y/g+tj+IIwtZMtTisemEv3hx+S9ngaW4nryrNcPM4xGzINcKbwUJtojslX2KG+DQ=='
+        crossorigin='anonymous' />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'
+        integrity='sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=='
+        crossorigin='anonymous' />
+    <style>
+        #ControlPanel {
+            border: 3px solid;
+            width: 700px;
+            height: 400px;
+            margin: auto;
+            text-align: center;
+        }
+
+        #ControlPanel>span {
+            border: 2px solid;
+            padding: 3px;
+            box-shadow: 2px 2px 5px black;
+            cursor: pointer;
+            font-family: Webdings;
+            font-size: 3rem;
+        }
+
+        .playerControl {
+            width: 500px;
+            margin: 0 auto;
+        }
+        .playerControl a{
+            transition: all 1s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ControlPanel">
+        <span onclick="Play(event)" id="btnPlay">4</span>
+        <span onclick="Stop()">
+            << /span>
+                <span onclick="changeTime(-5)">7</span>
+                <span onclick="changeTime(5)">8</span>
+                <input id="Text1" type="range" />
+                <input id="Button1" type="button" value="-" onclick="changeVolume(-0.01)" />
+                <input id="Button2" type="button" value="+" onclick="changeVolume(0.01)" />
+    </div>
+
+    <audio id="music" controls="controls">
+        <source src="music/elysees.mp3" type="audio/mpeg" />
+    </audio>
+    <div class="playerControl">
+        <a href="#"><i class="fa-solid fa-backward-fast"></i></a>
+        <a href="#"><i class="fa-solid fa-backward-step"></i></a>
+        <a href="#" onclick="Stop(event)"><i class="fa-solid fa-stop"></i></a>
+        <a href="#" onclick="Play(event)" id="btn-play"><i class="fa-solid fa-play"></i></a>
+        <a href="#"><i class="fa-solid fa-forward"></i></a>
+        <a href="#"><i class="fa-solid fa-forward-fast"></i></a>
+
+    </div>
+    <script>
+        const audio = document.getElementById("music");
+        console.log(audio);
+        //抓取audio dom資料
+        const btnPlay = document.getElementById("btn-play");
+        //抓取dom
+
+        // Play 播放功能
+        function Play(event) {
+            console.log(event);
+            // 看事件功能
+            event.preventDefault();
+            // 取消原生事件，超連結功能
+            if (audio.paused) {
+                // audio.paused 為原生布林值，判斷 audio 是否正在播放
+                audio.play();
+                // audio.play() 為原生api
+                btnPlay.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                // audio 如果正在播放，就換成暫停
+            }
+            else {
+                // 反之亦然
+                audio.pause();
+                btnPlay.innerHTML = `<i class="fa-solid fa-play"></i>`;
+            }
+        }
+        function Stop() {
+            event.preventDefault();
+            // 取消原生事件，超連結功能
+            audio.pause();
+            audio.currentTime = 0;
+            btnPlay.innerHTML = `<i class="fa-solid fa-play"></i>`;
+        }
+        //function Pause() {
+        //    audio.pause();
+        //}
+
+        function changeTime(t) {
+            audio.currentTime += t;
+        }
+
+        function changeVolume(v) {
+            audio.volume += v;
+        }
+
+    </script>
+</body>
+
+</html>
