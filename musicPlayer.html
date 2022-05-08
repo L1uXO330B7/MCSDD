@@ -12,6 +12,7 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'
         integrity='sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=='
         crossorigin='anonymous' />
+    <link rel="icon" href="./WebWangLogFinal.svg">
     <style>
         #ControlPanel {
             border: 3px solid;
@@ -33,10 +34,45 @@
         .playerControl {
             width: 500px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .playerControl a{
+
+        .playerControl>div:first-child {
+            margin: 0 auto;
+        }
+
+        .playerControl>div:nth-child(0n+1)>a {
+            font-size: 25px;
+            padding: 5px;
+            color: pink;
             transition: all 1s;
         }
+
+        .playerControl>div:nth-child(0n+2) {
+            display: flex;
+            justify-content: center;
+        }
+
+        #volumeControl {
+            appearance: none;
+            height: 40px;
+            width: 200px;
+            background: none;
+            /* // 清除不必要的東西 */
+            outline: none;
+            /* // 清除不必要的東西 */
+            border-radius: 0;
+            /* // 清除不必要的東西 */
+            overflow: hidden;
+            /* 晚點會用到 */
+            cursor: pointer;
+        }
+        #FISH{
+            width: 50px;
+        }
+   
     </style>
 </head>
 
@@ -56,21 +92,30 @@
         <source src="music/elysees.mp3" type="audio/mpeg" />
     </audio>
     <div class="playerControl">
-        <a href="#"><i class="fa-solid fa-backward-fast"></i></a>
-        <a href="#"><i class="fa-solid fa-backward-step"></i></a>
-        <a href="#" onclick="Stop(event)"><i class="fa-solid fa-stop"></i></a>
-        <a href="#" onclick="Play(event)" id="btn-play"><i class="fa-solid fa-play"></i></a>
-        <a href="#"><i class="fa-solid fa-forward"></i></a>
-        <a href="#"><i class="fa-solid fa-forward-fast"></i></a>
-
+        <div>
+            <a href="#"><i class="fa-solid fa-backward-fast"></i></a>
+            <a href="#" onclick="ChangeTime(-5)"><i class="fa-solid fa-backward"></i></a>
+            <a href="#" onclick="Stop(event)"><i class="fa-solid fa-stop"></i></a>
+            <a href="#" onclick="Play(event)" id="btn-play"><i class="fa-solid fa-play"></i></a>
+            <a href="#" onclick="ChangeTime(5)"><i class="fa-solid fa-forward"></i></a>
+            <a href="#"><i class="fa-solid fa-forward-fast"></i></a>
+            <a href="#" onclick="MuteVolume()" id="btn-mute"><i class="fa-solid fa-volume-high"></i></a>
+        </div>
+        <div>
+            <input type="button" />
+            <input id="volumeControl" type="range" />
+            <input type="button" />
+        </div>
     </div>
+
     <script>
-        const audio = document.getElementById("music");
+        const audio = document.querySelector("#music");
         console.log(audio);
         //抓取audio dom資料
-        const btnPlay = document.getElementById("btn-play");
+        const btnPlay = document.querySelector("#btn-play");
+        const btnMute = document.querySelector("#btn-mute");
         //抓取dom
-
+        let originVolume = 0;
         // Play 播放功能
         function Play(event) {
             console.log(event);
@@ -101,15 +146,32 @@
         //    audio.pause();
         //}
 
-        function changeTime(t) {
-            audio.currentTime += t;
+        function ChangeTime(time) {
+            event.preventDefault();
+            audio.currentTime += time;
         }
 
-        function changeVolume(v) {
-            audio.volume += v;
+        function MuteVolume() {
+            event.preventDefault();
+            if (audio.volume !== 0) {
+                originVolume = audio.volume;
+                audio.volume = 0;
+                ChangeVolume()
+            }
+            else {
+                audio.volume = originVolume;
+                btnMute.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+            }
         }
-
+        function ChangeVolume(Value) {
+            if (audio.volume == 0) {
+                btnMute.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
+                return
+            }
+        }
+        audio.addEventListener('volumechange', scrollVolume(), false);
     </script>
+
 </body>
 
 </html>
