@@ -12,7 +12,6 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'
         integrity='sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=='
         crossorigin='anonymous' />
-    <link rel="icon" href="./WebWangLogFinal.svg">
     <style>
         #ControlPanel {
             border: 3px solid;
@@ -69,52 +68,67 @@
             /* 晚點會用到 */
             cursor: pointer;
         }
-        #FISH{
-            width: 50px;
-        }
-   
     </style>
 </head>
 
 <body>
-    <div id="ControlPanel">
-        <span onclick="Play(event)" id="btnPlay">4</span>
-        <span onclick="Stop()">
-            << /span>
-                <span onclick="changeTime(-5)">7</span>
-                <span onclick="changeTime(5)">8</span>
-                <input id="Text1" type="range" />
-                <input id="Button1" type="button" value="-" onclick="changeVolume(-0.01)" />
-                <input id="Button2" type="button" value="+" onclick="changeVolume(0.01)" />
-    </div>
-
+<h1 title=""　></h1>
     <audio id="music" controls="controls">
-        <source src="music/elysees.mp3" type="audio/mpeg" />
+        <source src="./music/airball.mp3" type="audio/mpeg" />
     </audio>
-    <div class="playerControl">
+    <div class="MusicPlayer">
         <div>
-            <a href="#"><i class="fa-solid fa-backward-fast"></i></a>
-            <a href="#" onclick="ChangeTime(-5)"><i class="fa-solid fa-backward"></i></a>
-            <a href="#" onclick="Stop(event)"><i class="fa-solid fa-stop"></i></a>
-            <a href="#" onclick="Play(event)" id="btn-play"><i class="fa-solid fa-play"></i></a>
-            <a href="#" onclick="ChangeTime(5)"><i class="fa-solid fa-forward"></i></a>
-            <a href="#"><i class="fa-solid fa-forward-fast"></i></a>
-            <a href="#" onclick="MuteVolume()" id="btn-mute"><i class="fa-solid fa-volume-high"></i></a>
+            <select id="MusicSelect">
+                <option>好聽的歌</option>
+            </select>
         </div>
-        <div>
-            <input type="button" />
-            <input id="volumeControl" type="range" />
-            <input type="button" />
+        <div class="playerControl">
+            <div>
+                <a href="#"><i class="fa-solid fa-backward-fast"></i></a>
+                <a href="#" onclick="ChangeTime(-5)"><i class="fa-solid fa-backward"></i></a>
+                <a href="#" onclick="Stop(event)"><i class="fa-solid fa-stop"></i></a>
+                <a href="#" onclick="Play(event)" id="btn-play"><i class="fa-solid fa-play"></i></a>
+                <a href="#" onclick="ChangeTime(5)"><i class="fa-solid fa-forward"></i></a>
+                <a href="#"><i class="fa-solid fa-forward-fast"></i></a>
+                <a href="#" onclick="MuteVolume()" id="btn-mute"><i class="fa-solid fa-volume-high"></i></a>
+                <a href="#"><i class="fa-solid fa-shuffle"></i></a>
+                <a href="#"><i class="fa-solid fa-arrows-rotate"></i></a>
+                <a href="#"><i class="fa-solid fa-repeat"></i></a>
+            </div>
+            <div>
+                <input type="button" />
+                <input id="volumeControl" type="range" />
+                <input type="button" />
+            </div>
         </div>
     </div>
+    <input type="range" id="myInput" max="100" min="0">
+
 
     <script>
+        // 歌曲清單物件
+        const MusicList = [
+            { name: "Champs-Elyees", src: "./music/elysees.mp3", favorite: false },
+            { name: "告白氣球", src: "./music/airball.mp3", favorite: false },
+            { name: "帶你去旅行", src: "./music/travel.mp3", favorite: false },
+            { name: "私奔到月球", src: "./music/moon.mp3", favorite: false },
+            { name: "Nothing Ganna Change My Love For You", src: "./music/nothing.mp3", favorite: false },
+        ]
+        const MusicSelect = document.querySelector("#MusicSelect");
         const audio = document.querySelector("#music");
         console.log(audio);
         //抓取audio dom資料
         const btnPlay = document.querySelector("#btn-play");
         const btnMute = document.querySelector("#btn-mute");
         //抓取dom
+        RenderMusList()
+        function RenderMusList() {
+            let list = "";
+            MusicList.forEach((element, index, array) => {
+                list +=`<option>${element.name}</option>`
+            })
+            MusicSelect.innerHTML = list;
+        }
         let originVolume = 0;
         // Play 播放功能
         function Play(event) {
@@ -153,23 +167,34 @@
 
         function MuteVolume() {
             event.preventDefault();
-            if (audio.volume !== 0) {
-                originVolume = audio.volume;
-                audio.volume = 0;
-                ChangeVolume()
+            audio.muted = !audio.muted;
             }
-            else {
-                audio.volume = originVolume;
-                btnMute.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
-            }
-        }
         function ChangeVolume(Value) {
             if (audio.volume == 0) {
                 btnMute.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
                 return
             }
+            // 考慮使用get set 組合式
         }
-        audio.addEventListener('volumechange', scrollVolume(), false);
+        ///
+        var obj = {
+  myInput: document.getElementById('myInput'),
+  get input() {
+      return this.myInput.value;
+  },
+  set input(value) {
+      this.myInput.value = value;
+  }
+}
+
+obj.input = 50;
+console.log("ipnut",obj.input);
+// type something into input
+
+obj.myInput.addEventListener("input",function(){
+    console.log("ipnut",obj.input/100);
+    audio.volume = obj.input/100;
+})
     </script>
 
 </body>
