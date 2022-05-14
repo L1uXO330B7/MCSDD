@@ -24,7 +24,7 @@
         #ControlPanel>span {
             border: 2px solid;
             padding: 3px;
-            box-shadow: 2px 2px 5px black;
+            box-shadow: 2px 2px 5px rgb(95, 76, 76);
             cursor: pointer;
             font-family: Webdings;
             font-size: 3rem;
@@ -68,11 +68,20 @@
             /* 晚點會用到 */
             cursor: pointer;
         }
+        .circle{
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            border-top: 2px black solid;
+            border-right: 2px red solid;
+            border-bottom: 2px  red solid;
+            border-left: 2px red solid;
+        }
     </style>
 </head>
 
 <body>
-<h1 title=""　></h1>
+    <h1 title=""></h1>
     <audio id="music" controls="controls">
         <source src="./music/airball.mp3" type="audio/mpeg" />
     </audio>
@@ -96,15 +105,16 @@
                 <a href="#"><i class="fa-solid fa-repeat"></i></a>
             </div>
             <div>
-                <input type="button" />
+                <input type="button" onclick="obj.name(5)"/>
                 <input id="volumeControl" type="range" />
-                <input type="button" />
+                <input type="button" onclick="console.log(obj.name(5))"/>
             </div>
         </div>
     </div>
-    <input type="range" id="myInput" max="100" min="0">
-
-
+    <div class="card">
+        <div class="circle"></div>
+    </div>
+    <input type="file" oninput="console.log(event)">
     <script>
         // 歌曲清單物件
         const MusicList = [
@@ -125,7 +135,7 @@
         function RenderMusList() {
             let list = "";
             MusicList.forEach((element, index, array) => {
-                list +=`<option>${element.name}</option>`
+                list += `<option>${element.name}</option>`
             })
             MusicSelect.innerHTML = list;
         }
@@ -168,7 +178,7 @@
         function MuteVolume() {
             event.preventDefault();
             audio.muted = !audio.muted;
-            }
+        }
         function ChangeVolume(Value) {
             if (audio.volume == 0) {
                 btnMute.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
@@ -176,27 +186,27 @@
             }
             // 考慮使用get set 組合式
         }
+        let obj ={
+            name: (value)=>{
+               
+            },
+        }
         ///
-        var obj = {
-  myInput: document.getElementById('myInput'),
-  get input() {
-      return this.myInput.value;
-  },
-  set input(value) {
-      this.myInput.value = value;
-  }
-}
+        // let volumeObj = {
+        //     get input() {
+        //         myInput = document.getElementById('myInput');
+        //         return myInput.value;
+        //     },
+        //     set input(value) {
+        //         audio.volume = value / 100;
+        //     }
+        // }
 
-obj.input = 50;
-console.log("ipnut",obj.input);
-// type something into input
+        // volumeObj.input = 50;
+        // console.log("ipnut", volumeObj.input);
+        // type something into input
 
-obj.myInput.addEventListener("input",function(){
-    console.log("ipnut",obj.input/100);
-    audio.volume = obj.input/100;
-})
     </script>
-
 </body>
 
 </html>
