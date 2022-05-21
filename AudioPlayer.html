@@ -108,6 +108,7 @@
     </audio>
     <div class="PlayerControl">
         <div>
+            <button onclick="Play()">play</button>
             <button><i class="fa-solid fa-backward-fast"></i></button>
             <button id="Backward"><i class="fa-solid fa-backward"></i></button>
             <button id="BtnStop"><i class="fa-solid fa-stop"></i></button>
@@ -125,6 +126,14 @@
             <input id="VolumeControl" type="range" max="100" min="0" />
             <button id="VolPlus"><i class="fa-solid fa-plus"></i></button>
         </div>
+        <div class="MusicBook">
+            <div id="SongList">
+
+            </div>
+            <div id="MySongs">
+
+            </div>
+        </div>
     </div>
     <div id="container"></div>
 
@@ -141,196 +150,200 @@
     <script type="module">
 
         import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r115/build/three.module.js';
+            let scene, camera, renderer, analyser, uniforms;
 
-        let scene, camera, renderer, analyser, uniforms;
-
-        const MediaElement = document.getElementById('MediaElement');
-        const Backward = document.getElementById('Backward');
-        const Forward = document.getElementById('Forward');
-        const PlayBtn = document.getElementById('BtnPlay');
-        const StopBtn = document.getElementById('BtnStop');
-        const VolumeControl = document.getElementById('VolumeControl');
-        const VolInfo = document.getElementById('VolInfo');
-        const VolMinus = document.getElementById('VolMinus');
-        const VolPlus = document.getElementById('VolPlus');
-        const MuteBtn = document.getElementById('BtnMute');
-
-        MuteBtn.addEventListener('click', SetMute);
-        VolumeControl.addEventListener('input', SetVolume);
-        VolMinus.addEventListener('click', function () {
-            ChangeVolume(-1);
-        })
-        VolPlus.addEventListener('click', function () {
-            ChangeVolume(1);
-        })
-        StopBtn.addEventListener('click', Stop);
-        PlayBtn.addEventListener('click', Play);
-        Backward.addEventListener('click', function () {
-            ChangeTime(-5);
-        })
-        Forward.addEventListener('click', function () {
-            ChangeTime(5);
-        })
-        Init();
-        RenderList();
-        function ChangeVolume(v) {
-            VolumeControl.value = parseInt(VolumeControl.value) + v;
-            SetVolume();
-        }
-        function SetMute(){
-            MediaElement.muted = !MediaElement.muted;
-           
-            SetVolume();
-        }
-        SetVolume();
-        function SetVolume() {
-            VolInfo.value = `目前音量:${VolumeControl.value}`;
-            MediaElement.volume = VolumeControl.value/100;
-            if (MediaElement.volume==0||MediaElement.muted){
-                MuteBtn.innerHTML=`<i class="fa-solid fa-volume-xmark"></i>`;
-            }
-            else{
-                MuteBtn.innerHTML=`<i class="fa-solid fa-volume-high"></i>`;
-            }
-        }
-        function Stop() {
-            MediaElement.pause();
-            MediaElement.currentTime = 0;
-            PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`
-        }
-        function Play() {
-            if (MediaElement.paused) {
-                //MediaElement.paused 是 boolean
-                MediaElement.play();
-                PlayBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-            }
-            else {
-                MediaElement.pause();
-                PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-            }
-        }
-        function ChangeTime(time) {
-            MediaElement.currentTime += time;
-        }
-        function Init() {
-
-            const fftSize = 128;
+            const MediaElement = document.getElementById('MediaElement');
+            const Backward = document.getElementById('Backward');
+            const Forward = document.getElementById('Forward');
+            const PlayBtn = document.getElementById('BtnPlay');
+            const StopBtn = document.getElementById('BtnStop');
+            const VolumeControl = document.getElementById('VolumeControl');
+            const VolInfo = document.getElementById('VolInfo');
+            const VolMinus = document.getElementById('VolMinus');
+            const VolPlus = document.getElementById('VolPlus');
+            const MuteBtn = document.getElementById('BtnMute');
+            const SongList = document.getElementById('SongList'); 
 
 
-            const container = document.getElementById('container');
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-
-            scene = new THREE.Scene();
-
-            camera = new THREE.Camera();
-
-            //
-
-            const listener = new THREE.AudioListener();
-            console.log(listener, "listener");
-
-            const audio = new THREE.Audio(listener);
-            console.log(audio, "audio");
-            const file = "/musicPlayer/music/airball.mp3";
-            // if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
-            // 行動裝置版本
-            //     const loader = new THREE.AudioLoader();
-            //     loader.load(file, function (buffer) {
-
-            //         audio.setBuffer(buffer);
-            //         audio.play();
-
-            //     });
-
-            // } else {
-
-            // const mediaElement = document.getElementById('MusicElement');
-
-            audio.setMediaElementSource(MediaElement);
-
-            // }
-
-            analyser = new THREE.AudioAnalyser(audio, fftSize);
-
-            //
-
-            const format = (renderer.capabilities.isWebGL2) ? THREE.RedFormat : THREE.LuminanceFormat;
-
-            uniforms = {
-
-                tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 2, 1, format) }
-
-            };
-
-            const material = new THREE.ShaderMaterial({
-
-                uniforms: uniforms,
-                vertexShader: document.getElementById('vertexShader').textContent,
-                fragmentShader: document.getElementById('fragmentShader').textContent
-
-            });
-
-            const geometry = new THREE.PlaneGeometry(1, 1);
-
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-
-            //
-
-            window.addEventListener('resize', onWindowResize);
-
-            animate();
-
-        }
-
-        function onWindowResize() {
-
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-        }
-
-        function animate() {
-
-            requestAnimationFrame(animate);
-
-            render();
-
-        }
-
-        function render() {
-
-            analyser.getFrequencyData();
-
-            uniforms.tAudioData.value.needsUpdate = true;
-
-            renderer.render(scene, camera);
-
-        }
-        function ConsoleMusic() {
-            console.log()
-        }
-
-        function RenderList() {
-            const MusicList = [
-                { name: "Champs-Elyees", src: "/music/elysees.mp3", favorite: false },
-                { name: "告白氣球", src: "/music/airball.mp3", favorite: false },
-                { name: "帶你去旅行", src: "/music/travel.mp3", favorite: false },
-                { name: "私奔到月球", src: "/music/moon.mp3", favorite: false },
-                { name: "Nothing Ganna Change My Love For You", src: "/music/nothing.mp3", favorite: false },
-            ]
-            let str = "";
-            const Select = document.querySelector('#MusicSelect');
-            MusicList.forEach((music, index, array) => {
-                str += `<option>${music.name}</option>`
+            MuteBtn.addEventListener('click', SetMute);
+            VolumeControl.addEventListener('input', SetVolume);
+            VolMinus.addEventListener('click', function () {
+                ChangeVolume(-1);
             })
-            Select.innerHTML = str;
-        }
+            VolPlus.addEventListener('click', function () {
+                ChangeVolume(1);
+            })
+            StopBtn.addEventListener('click', Stop);
+            PlayBtn.addEventListener('click', Play);
+            Backward.addEventListener('click', function () {
+                ChangeTime(-5);
+            })
+            Forward.addEventListener('click', function () {
+                ChangeTime(5);
+            })
+            Init();
+            InitList();
+            function ChangeVolume(v) {
+                VolumeControl.value = parseInt(VolumeControl.value) + v;
+                SetVolume();
+            }
+            function SetMute() {
+                MediaElement.muted = !MediaElement.muted;
 
+                SetVolume();
+            }
+            SetVolume();
+            function SetVolume() {
+                VolInfo.value = `目前音量:${VolumeControl.value}`;
+                MediaElement.volume = VolumeControl.value / 100;
+                if (MediaElement.volume == 0 || MediaElement.muted) {
+                    MuteBtn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
+                }
+                else {
+                    MuteBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+                }
+            }
+            function Stop() {
+                MediaElement.pause();
+                MediaElement.currentTime = 0;
+                PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`
+            }
+            function Play() {
+                if (MediaElement.paused) {
+                    //MediaElement.paused 是 boolean
+                    MediaElement.play();
+                    PlayBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                }
+                else {
+                    MediaElement.pause();
+                    PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+                }
+            }
+            function ChangeTime(time) {
+                MediaElement.currentTime += time;
+            }
+            function Init() {
+
+                const fftSize = 128;
+
+
+                const container = document.getElementById('container');
+
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setClearColor(0x000000);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+
+                scene = new THREE.Scene();
+
+                camera = new THREE.Camera();
+
+                //
+
+                const listener = new THREE.AudioListener();
+                console.log(listener, "listener");
+
+                const audio = new THREE.Audio(listener);
+                console.log(audio, "audio");
+                const file = "/musicPlayer/music/airball.mp3";
+                // if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+                // 行動裝置版本
+                //     const loader = new THREE.AudioLoader();
+                //     loader.load(file, function (buffer) {
+
+                //         audio.setBuffer(buffer);
+                //         audio.play();
+
+                //     });
+
+                // } else {
+
+                // const mediaElement = document.getElementById('MusicElement');
+
+                audio.setMediaElementSource(MediaElement);
+
+                // }
+
+                analyser = new THREE.AudioAnalyser(audio, fftSize);
+
+                //
+
+                const format = (renderer.capabilities.isWebGL2) ? THREE.RedFormat : THREE.LuminanceFormat;
+
+                uniforms = {
+
+                    tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 2, 1, format) }
+
+                };
+
+                const material = new THREE.ShaderMaterial({
+
+                    uniforms: uniforms,
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent
+
+                });
+
+                const geometry = new THREE.PlaneGeometry(1, 1);
+
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                //
+
+                window.addEventListener('resize', onWindowResize);
+
+                animate();
+
+            }
+
+            function onWindowResize() {
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+            }
+
+            function animate() {
+
+                requestAnimationFrame(animate);
+
+                render();
+
+            }
+
+            function render() {
+
+                analyser.getFrequencyData();
+
+                uniforms.tAudioData.value.needsUpdate = true;
+
+                renderer.render(scene, camera);
+
+            }
+          
+
+            function InitList() {
+                const MusicList = [
+                    { name: "Champs-Elyees", src: "/music/elysees.mp3", favorite: false },
+                    { name: "告白氣球", src: "/music/airball.mp3", favorite: false },
+                    { name: "帶你去旅行", src: "/music/travel.mp3", favorite: false },
+                    { name: "私奔到月球", src: "/music/moon.mp3", favorite: false },
+                    { name: "Nothing Ganna Change My Love For You", src: "/music/nothing.mp3", favorite: false },
+                ]
+                let str = "";
+                MusicList.forEach((music, index, array) => {
+                    str += `<option draggable="true" id="Song${index+1}">${music.name}</option>`
+                })
+                
+                SongList.innerHTML = str;
+                
+                for(let i = 0;i<SongList.children.length;i++){
+                    SongList.children[i].addEventListener('dragstart', function(){
+                        drag(event);
+                    })
+                }
+            }
     </script>
 
 </body>
