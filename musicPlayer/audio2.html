@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>three.js webaudio - visualizer</title>
+    <title>愷的視覺化撥放器</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'
@@ -589,7 +589,7 @@
 
                 uniforms = {
 
-                    tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 4, 1, format) }
+                    tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 3, 1, format) }
                     //http://www.yanhuangxueyuan.com/doc/Three.js/DataTexture.html
                 };
 
@@ -643,7 +643,7 @@
                 const MusicList = [
                     { name: "痛苦造就了我們", src: "music/痛苦造就了我們.mp3", favorite: false },
                     { name: "告白氣球", src: "music/airball.mp3", favorite: false },
-                    { name: "帶你去旅行", src: "music/travel.mp3", favorite: false },
+                    { name: "假朋友真兄弟", src: "music/假朋友真兄弟.mp3", favorite: false },
                     { name: "私奔到月球", src: "music/moon.mp3", favorite: false },
                     { name: "Nothing Ganna Change My Love For You", src: "music/nothing.mp3", favorite: false },
                     { name: "搖啊搖", src: "music/搖啊搖.mp3", favorite: false },
