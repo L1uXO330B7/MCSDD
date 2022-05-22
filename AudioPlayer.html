@@ -107,6 +107,11 @@
         <source src="/musicPlayer/music/airball.mp3" />
     </audio>
     <div class="PlayerControl">
+        <div id="SongInfo">
+            <marquee>請按下播放鈕</marquee>
+            <div>00:00 / 00:00</div>
+            <div>狀態</div>        
+        </div>
         <div>
             <button onclick="Play()">play</button>
             <button><i class="fa-solid fa-backward-fast"></i></button>
@@ -150,78 +155,80 @@
     <script type="module">
 
         import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r115/build/three.module.js';
-            let scene, camera, renderer, analyser, uniforms;
+        let scene, camera, renderer, analyser, uniforms;
 
-            const MediaElement = document.getElementById('MediaElement');
-            const Backward = document.getElementById('Backward');
-            const Forward = document.getElementById('Forward');
-            const PlayBtn = document.getElementById('BtnPlay');
-            const StopBtn = document.getElementById('BtnStop');
-            const VolumeControl = document.getElementById('VolumeControl');
-            const VolInfo = document.getElementById('VolInfo');
-            const VolMinus = document.getElementById('VolMinus');
-            const VolPlus = document.getElementById('VolPlus');
-            const MuteBtn = document.getElementById('BtnMute');
-            const SongList = document.getElementById('SongList'); 
-
-
-            MuteBtn.addEventListener('click', SetMute);
-            VolumeControl.addEventListener('input', SetVolume);
-            VolMinus.addEventListener('click', function () {
-                ChangeVolume(-1);
-            })
-            VolPlus.addEventListener('click', function () {
-                ChangeVolume(1);
-            })
-            StopBtn.addEventListener('click', Stop);
-            PlayBtn.addEventListener('click', Play);
-            Backward.addEventListener('click', function () {
-                ChangeTime(-5);
-            })
-            Forward.addEventListener('click', function () {
-                ChangeTime(5);
-            })
-            Init();
-            InitList();
-            function ChangeVolume(v) {
-                VolumeControl.value = parseInt(VolumeControl.value) + v;
-                SetVolume();
-            }
-            function SetMute() {
-                MediaElement.muted = !MediaElement.muted;
-
-                SetVolume();
-            }
+        const MediaElement = document.getElementById('MediaElement');
+        const Backward = document.getElementById('Backward');
+        const Forward = document.getElementById('Forward');
+        const PlayBtn = document.getElementById('BtnPlay');
+        const StopBtn = document.getElementById('BtnStop');
+        const VolumeControl = document.getElementById('VolumeControl');
+        const VolInfo = document.getElementById('VolInfo');
+        const VolMinus = document.getElementById('VolMinus');
+        const VolPlus = document.getElementById('VolPlus');
+        const MuteBtn = document.getElementById('BtnMute');
+        const SongList = document.getElementById('SongList');
+        const MusicSelect = document.getElementById('MusicSelect');
+        const listener = new THREE.AudioListener();
+        const audio = new THREE.Audio(listener);
+        MuteBtn.addEventListener('click', SetMute);
+        VolumeControl.addEventListener('input', SetVolume);
+        VolMinus.addEventListener('click', function () {
+            ChangeVolume(-1);
+        })
+        VolPlus.addEventListener('click', function () {
+            ChangeVolume(1);
+        })
+        StopBtn.addEventListener('click', Stop);
+        PlayBtn.addEventListener('click', Play);
+        Backward.addEventListener('click', function () {
+            ChangeTime(-5);
+        })
+        Forward.addEventListener('click', function () {
+            ChangeTime(5);
+        })
+        Init();
+        InitList();
+        function ChangeVolume(v) {
+            VolumeControl.value = parseInt(VolumeControl.value) + v;
             SetVolume();
-            function SetVolume() {
-                VolInfo.value = `目前音量:${VolumeControl.value}`;
-                MediaElement.volume = VolumeControl.value / 100;
-                if (MediaElement.volume == 0 || MediaElement.muted) {
-                    MuteBtn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
-                }
-                else {
-                    MuteBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
-                }
+        }
+        function SetMute() {
+            MediaElement.muted = !MediaElement.muted;
+
+            SetVolume();
+        }
+        SetVolume();
+        function SetVolume() {
+            VolInfo.value = `目前音量:${VolumeControl.value}`;
+            MediaElement.volume = VolumeControl.value / 100;
+            if (MediaElement.volume == 0 || MediaElement.muted) {
+                MuteBtn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
             }
-            function Stop() {
+            else {
+                MuteBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+            }
+        }
+        function Stop() {
+            MediaElement.pause();
+            MediaElement.currentTime = 0;
+            PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`
+        }
+        function Play() {
+            if (MediaElement.paused) {
+                //MediaElement.paused 是 boolean
+                playSound();
+                PlayBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+            }
+            else {
                 MediaElement.pause();
-                MediaElement.currentTime = 0;
-                PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`
+                PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
             }
-            function Play() {
-                if (MediaElement.paused) {
-                    //MediaElement.paused 是 boolean
-                    MediaElement.play();
-                    PlayBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-                }
-                else {
-                    MediaElement.pause();
-                    PlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-                }
-            }
-            function ChangeTime(time) {
-                MediaElement.currentTime += time;
-            }
+        }
+        function ChangeTime(time) {
+            MediaElement.currentTime += time;
+        }
+        window.onload = function () {
             function Init() {
 
                 const fftSize = 128;
@@ -241,10 +248,6 @@
 
                 //
 
-                const listener = new THREE.AudioListener();
-                console.log(listener, "listener");
-
-                const audio = new THREE.Audio(listener);
                 console.log(audio, "audio");
                 const file = "/musicPlayer/music/airball.mp3";
                 // if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
@@ -297,53 +300,62 @@
                 animate();
 
             }
+        }
 
-            function onWindowResize() {
 
-                renderer.setSize(window.innerWidth, window.innerHeight);
+        function onWindowResize() {
 
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            render();
+
+        }
+
+        function render() {
+
+            analyser.getFrequencyData();
+
+            uniforms.tAudioData.value.needsUpdate = true;
+
+            renderer.render(scene, camera);
+
+        }
+        function playSound() {
+                let audioLoader = new THREE.AudioLoader();
+                const mediaUrl = MediaElement.children[0].src;
+                audioLoader.load(mediaUrl, function (buffer) {
+                    audio.setBuffer(buffer);
+                    audio.setLoop(false);
+                    audio.setVolume(0.5);
+                    if (audio.play() == undefined) {
+                        audio.stop();
+                    }
+                });
             }
 
-            function animate() {
+        function InitList() {
+            const MusicList = [
+                { name: "Champs-Elyees", src: "/music/elysees.mp3", favorite: false },
+                { name: "告白氣球", src: "/music/airball.mp3", favorite: false },
+                { name: "帶你去旅行", src: "/music/travel.mp3", favorite: false },
+                { name: "私奔到月球", src: "/music/moon.mp3", favorite: false },
+                { name: "Nothing Ganna Change My Love For You", src: "/music/nothing.mp3", favorite: false },
+            ]
+            let str = "";
+            MusicList.forEach((music, index, array) => {
+                str += `<option draggable="true" id="Song${index + 1}">${music.name}</option>`
+            })
 
-                requestAnimationFrame(animate);
+            SongList.innerHTML = str;
 
-                render();
 
-            }
-
-            function render() {
-
-                analyser.getFrequencyData();
-
-                uniforms.tAudioData.value.needsUpdate = true;
-
-                renderer.render(scene, camera);
-
-            }
-          
-
-            function InitList() {
-                const MusicList = [
-                    { name: "Champs-Elyees", src: "/music/elysees.mp3", favorite: false },
-                    { name: "告白氣球", src: "/music/airball.mp3", favorite: false },
-                    { name: "帶你去旅行", src: "/music/travel.mp3", favorite: false },
-                    { name: "私奔到月球", src: "/music/moon.mp3", favorite: false },
-                    { name: "Nothing Ganna Change My Love For You", src: "/music/nothing.mp3", favorite: false },
-                ]
-                let str = "";
-                MusicList.forEach((music, index, array) => {
-                    str += `<option draggable="true" id="Song${index+1}">${music.name}</option>`
-                })
-                
-                SongList.innerHTML = str;
-                
-                for(let i = 0;i<SongList.children.length;i++){
-                    SongList.children[i].addEventListener('dragstart', function(){
-                        drag(event);
-                    })
-                }
-            }
+        }
     </script>
 
 </body>
