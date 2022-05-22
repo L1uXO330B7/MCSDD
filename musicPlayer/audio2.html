@@ -181,7 +181,7 @@
 
 			}
 
-		</script>
+	</script>
 
 </head>
 
@@ -475,7 +475,7 @@
             }
             function Init() {
 
-                const fftSize = 128;
+            
 
 
                 const container = document.getElementById('container');
@@ -497,14 +497,14 @@
                 audio.hasPlaybackControl = true;
                 let audioLoader = new THREE.AudioLoader();
 
-                audioLoader.load(MediaElement.children[0].src, function (buffer) {
-                    audio.setBuffer(buffer);
-                    audio.setLoop(false);
-                    audio.setVolume(0.5);
-                });
+                // audioLoader.load(MediaElement.children[0].src, function (buffer) {
+                //     audio.setBuffer(buffer);
+                //     audio.setLoop(false);
+                //     audio.setVolume(0.5);
+                // });
 
                 // }
-
+                const fftSize = 512;
                 analyser = new THREE.AudioAnalyser(audio, fftSize);
 
                 //
@@ -513,8 +513,8 @@
 
                 uniforms = {
 
-                    tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 2, 1, format) }
-
+                    tAudioData: { value: new THREE.DataTexture(analyser.data, fftSize / 4, 1, format) }
+                    //http://www.yanhuangxueyuan.com/doc/Three.js/DataTexture.html
                 };
 
                 const material = new THREE.ShaderMaterial({
