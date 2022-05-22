@@ -182,7 +182,7 @@
             animation-name: select;
             animation-duration: 10s;
             animation-iteration-count: infinite;
-            transition:all 1.5s;
+            transition: all 1.5s;
 
         }
 
@@ -195,13 +195,16 @@
             25% {
                 background: linear-gradient(to right, #bfe9ff, #ff6e7f);
             }
-            50%{
-                
+
+            50% {
+
                 background: linear-gradient(to right, #bfe9ff, #bfe9ff);
             }
+
             75% {
                 background: linear-gradient(to right, #ff6e7f, #bfe9ff);
             }
+
             100% {
                 background: linear-gradient(to right, #ff6e7f, #ff6e7f);
             }
@@ -676,11 +679,13 @@
                 event.preventDefault();
                 console.log(event);
                 let data = event.dataTransfer.getData("song");
-                console.log(event.target)
-                if (event.target.id == "Mysongs" || "SongList")
+                if (!event.target.draggable) {
                     event.target.appendChild(document.getElementById(data));
-                else
+                }
+                else {
+
                     event.target.parentNode.appendChild(document.getElementById(data));
+                }
             }
 
         }
