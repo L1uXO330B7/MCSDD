@@ -227,8 +227,13 @@
         #container {
             margin-top: 45px;
         }
+        h3{
+            position: absolute;
+            margin-top: 10px;
+            writing-mode: vertical-lr;
+        }
     </style>
-
+    <!-- WEBGL物件 https://ithelp.ithome.com.tw/articles/10159042-->
     <script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
@@ -240,7 +245,6 @@
 				gl_Position = vec4( position, 1.0 );
 
 			}
-
 		</script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
@@ -266,6 +270,7 @@
 </head>
 
 <body>
+    <h3>動畫因安全性問題需要使用本地伺服器開啟瀏覽器觀看</h3>
     <audio controls id="MediaElement" style="display: none;">
         <source />
     </audio>
@@ -311,19 +316,24 @@
 
     <!-- Import maps polyfill -->
     <!-- Remove this when import maps will be widely supported -->
-    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <!-- <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
     <script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js"
 				}
 			}
-		</script>
+		</script> -->
     <script type="module">
+        // type = module 才能使用 import 或 export 
+        // 如果要在全域script使用，要將物件回給windows
+        //https://stackoverflow.com/questions/54510003/how-do-i-assign-a-function-to-the-window-object-while-using-an-es6-module
         import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r115/build/three.module.js';
+        //import three 模組
         window.onload = function () {
+            //網頁生命週期載入時間
             let scene, camera, renderer, analyser, uniforms;
-
+            //全域變數宣告場景、鏡頭、渲染器、分析器 
             const MediaElement = document.getElementById('MediaElement');
             const Backward = document.getElementById('Backward');
             const Forward = document.getElementById('Forward');
@@ -347,11 +357,13 @@
             const LoopBtn = document.getElementById('BtnLoop');
             const BookBtn = document.getElementById('BtnBook');
             const AllLoopBtn = document.getElementById('BtnAllLoop');
-            const listener = new THREE.AudioListener();
+
+
+            const listener = new THREE.AudioListener();//new一個虛擬的three listener物件
 
             console.log(listener, "listener");
 
-            const audio = new THREE.Audio(listener);
+            const audio = new THREE.Audio(listener);//new 一個虛擬three audio 
             console.log(audio, "audio");
 
 
@@ -557,10 +569,10 @@
 
 
 
-                const container = document.getElementById('container');
+                const container = document.getElementById('container');//動畫容器
 
-                renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer = new THREE.WebGLRenderer({ antialias: true });//wegl渲染器
+                renderer.setSize(window.innerWidth, window.innerHeight);//設定大小
                 renderer.setClearColor(0x000000);
                 renderer.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer.domElement);
@@ -572,8 +584,8 @@
                 //
 
 
-                audio.setMediaElementSource(MediaElement);
-                audio.hasPlaybackControl = true;
+                audio.setMediaElementSource(MediaElement);//取得HTML aduio
+                audio.hasPlaybackControl = true//打開才可使用audioloader
                 let audioLoader = new THREE.AudioLoader();
 
                 // audioLoader.load(MediaElement.children[0].src, function (buffer) {
@@ -583,7 +595,7 @@
                 // });
 
                 // }
-                const fftSize = 512;
+                const fftSize = 512;//快速傅立葉轉換，獲取音頻數據 只能是2的次方>32
                 analyser = new THREE.AudioAnalyser(audio, fftSize);
 
                 //
@@ -597,7 +609,8 @@
                 };
 
                 const material = new THREE.ShaderMaterial({
-
+                    //https://ithelp.ithome.com.tw/articles/10225339?sc=rss.iron
+                    //用 uniforms 操作 webgl
                     uniforms: uniforms,
                     vertexShader: document.getElementById('vertexShader').textContent,
                     fragmentShader: document.getElementById('fragmentShader').textContent
